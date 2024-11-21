@@ -49,14 +49,42 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
-	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+	t.Run("purge logic", func(_ *testing.T) {
+		c := NewCache(3)
+		c.Set("elem_1", 100)
+		c.Set("elem_2", 200)
+		c.Set("elem_3", 300)
+		c.Set("elem_4", 400)
+
+		_, existElem1 := c.Get("elem_1")
+		require.Equal(t, false, existElem1, "failed simple push")
+
+		c.Clear()
+		_, existElem2 := c.Get("elem_2")
+		_, existElem3 := c.Get("elem_3")
+		_, existElem4 := c.Get("elem_4")
+		require.Equal(t, false, existElem2 && existElem3 && existElem4, "failed clear cache")
+
+		c.Set("elem_1", 100)
+		c.Set("elem_2", 200)
+		c.Set("elem_3", 300)
+		c.Get("elem_1")
+		c.Get("elem_1")
+		c.Get("elem_2")
+		c.Get("elem_2")
+		c.Set("elem_1", 1100)
+		c.Set("elem_4", 400)
+
+		_, existElem3 = c.Get("elem_3")
+		require.Equal(t, false, existElem3, "failed complex push: exist element")
+		_, existElem1 = c.Get("elem_1")
+		_, existElem2 = c.Get("elem_2")
+		_, existElem4 = c.Get("elem_4")
+		require.Equal(t, true, existElem1 && existElem2 && existElem4, "failed complex push: not exist element")
 	})
 }
 
-func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
-
+func TestCacheMultithreading(_ *testing.T) {
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
