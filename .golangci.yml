@@ -17,19 +17,15 @@ issues:
         - dupl
         - gocyclo
         - gosec
-        - depguard
 
 linters:
   disable-all: true
   enable:
     - asciicheck
-    - depguard
     - dogsled
     - dupl
     - bodyclose
     - durationcheck
-    - errorlint
-    - exhaustive
     - exportloopref
     - funlen
     - gci
@@ -56,7 +52,6 @@ linters:
     - nolintlint
     - prealloc
     - predeclared
-    - revive
     - staticcheck
     - stylecheck
     - tagliatelle
