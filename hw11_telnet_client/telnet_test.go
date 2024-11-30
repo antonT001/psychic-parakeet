@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net"
 	"sync"
@@ -61,5 +62,33 @@ func TestTelnetClient(t *testing.T) {
 		}()
 
 		wg.Wait()
+	})
+	t.Run("failed connect", func(t *testing.T) {
+		in := &bytes.Buffer{}
+		out := &bytes.Buffer{}
+
+		l, err := net.Listen("tcp", "127.0.0.1:")
+		require.NoError(t, err)
+
+		require.NoError(t, l.Close())
+
+		timeout, err := time.ParseDuration("1s")
+		require.NoError(t, err)
+
+		client := NewTelnetClient(l.Addr().String(), timeout, io.NopCloser(in), out)
+		require.Equal(t, client.Connect(), fmt.Errorf("failed connect to %s", l.Addr().String()))
+	})
+
+	t.Run("check for connection creation", func(t *testing.T) {
+		in := &bytes.Buffer{}
+		out := &bytes.Buffer{}
+
+		timeout, err := time.ParseDuration("1s")
+		require.NoError(t, err)
+
+		client := NewTelnetClient("1.1.1.1", timeout, io.NopCloser(in), out)
+		require.Equal(t, client.Close(), ErrConnNotEstablished)
+		require.Equal(t, client.Send(), ErrConnNotEstablished)
+		require.Equal(t, client.Receive(), ErrConnNotEstablished)
 	})
 }

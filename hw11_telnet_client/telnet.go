@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var ErrConnNotEstablished = errors.New("connection is not established")
+
 type (
 	TelnetClient interface {
 		Connect() error
@@ -50,14 +52,14 @@ func (t *telnetClient) Connect() error {
 
 func (t *telnetClient) Close() error {
 	if t.conn == nil {
-		return errors.New("connection is not established")
+		return ErrConnNotEstablished
 	}
 	return t.conn.Close()
 }
 
 func (t *telnetClient) Send() error {
 	if t.conn == nil {
-		return errors.New("connection is not established")
+		return ErrConnNotEstablished
 	}
 
 	for t.localS.Scan() {
@@ -71,7 +73,7 @@ func (t *telnetClient) Send() error {
 
 func (t *telnetClient) Receive() error {
 	if t.conn == nil {
-		return errors.New("connection is not established")
+		return ErrConnNotEstablished
 	}
 
 	for t.netS.Scan() {
